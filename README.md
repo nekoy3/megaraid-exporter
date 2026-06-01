@@ -7,6 +7,16 @@ Prometheus で監視するための、小さな Python 製 exporter です。
 `smartctl` 経由で取得できる SMART 属性、仮想ドライブの劣化状態、
 `/proc/diskstats` から取る読み書き量をまとめて `/metrics` として公開します。
 
+# Docker での動作について
+
+この exporter は、RAID コントローラとホスト側デバイスに触れる必要があるため、Dockerfile での動作は非推奨です。
+以下についてコンテナ内から実行することを考慮する必要があり、Docker で運用するメリットが薄い為です。
+
+- megacli を実行できること
+- smartctl -d megaraid,N /dev/bus/0 が通ること
+- /proc/diskstats を読めること
+- lsblk と /sys から block device 情報を取れること
+
 ## MegaRAID とは
 
 MegaRAID は Broadcom / LSI 系の RAID コントローラ製品群です。
