@@ -189,6 +189,8 @@ Grafana のスクリーンショットを repo に追加する場合は、
 
 ![Grafana dashboard example](docs/images/grafana-dashboard.png)
 
+（ちなみにdegratedになってるのは、不良セクタが発生した disk3 を切り離して不完全な状態になっているため）
+
 ## メトリクス一覧
 
 ### 物理ドライブ
