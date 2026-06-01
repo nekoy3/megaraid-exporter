@@ -1,0 +1,1506 @@
+{
+  "title": "MegaRAID panels extracted from home dashboard",
+  "source_dashboard_uid": "icmp-monitoring",
+  "source_dashboard_title": "🏠 ホームネットワーク統合ダッシュボード",
+  "panel_ids": [
+    3200,
+    3201,
+    3202,
+    3203,
+    3204,
+    3210,
+    3211,
+    3212,
+    3213,
+    3205,
+    3206,
+    3207,
+    3214,
+    3215,
+    3216,
+    3217
+  ],
+  "panels": [
+    {
+      "id": 3200,
+      "type": "row",
+      "title": "💽 pve03 MegaRAID (ServeRAID M5210)",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 379
+      },
+      "panels": [],
+      "datasource": {
+        "type": "prometheus",
+        "uid": "edum6q95peoe8d"
+      }
+    },
+    {
+      "id": 3201,
+      "type": "stat",
+      "title": "💽 データアレイ (sda)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "edum6q95peoe8d"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 380
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "megaraid_vd_optimal{instance=\"pve03.mynk.home\",name=\"VD\"}",
+          "instant": true
+        }
+      ],
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value_and_name",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Degraded ⚠️",
+                  "color": "red",
+                  "index": 0
+                },
+                "1": {
+                  "text": "Optimal ✓",
+                  "color": "green",
+                  "index": 1
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 3202,
+      "type": "stat",
+      "title": "💽 OSブートアレイ (sdb)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "edum6q95peoe8d"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 380
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "megaraid_vd_optimal{instance=\"pve03.mynk.home\",name=\"pve\"}",
+          "instant": true
+        }
+      ],
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value_and_name",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Degraded ⚠️",
+                  "color": "red",
+                  "index": 0
+                },
+                "1": {
+                  "text": "Optimal ✓",
+                  "color": "green",
+                  "index": 1
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 3203,
+      "type": "stat",
+      "title": "🟢 ドライブ Online",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "edum6q95peoe8d"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 8,
+        "y": 380
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "sum(megaraid_pd_online{instance=\"pve03.mynk.home\"})",
+          "instant": true
+        }
+      ],
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value_and_name",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 3
+              },
+              {
+                "color": "green",
+                "value": 4
+              }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 3204,
+      "type": "stat",
+      "title": "⚠️ エラー合計",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "edum6q95peoe8d"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 11,
+        "y": 380
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "sum(megaraid_pd_media_errors_total{instance=\"pve03.mynk.home\"}) + sum(megaraid_pd_predictive_failures_total{instance=\"pve03.mynk.home\"})",
+          "instant": true
+        }
+      ],
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "なし",
+                  "color": "green",
+                  "index": 0
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 3210,
+      "type": "stat",
+      "title": "🌡️ Drive 0",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "edum6q95peoe8d"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 14,
+        "y": 380
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "megaraid_pd_temperature_celsius{instance=\"pve03.mynk.home\",slot=\"0\"}",
+          "instant": true
+        }
+      ],
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 20
+              },
+              {
+                "color": "yellow",
+                "value": 45
+              },
+              {
+                "color": "orange",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 55
+              }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 3211,
+      "type": "stat",
+      "title": "🌡️ Drive 1",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "edum6q95peoe8d"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 17,
+        "y": 380
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "megaraid_pd_temperature_celsius{instance=\"pve03.mynk.home\",slot=\"1\"}",
+          "instant": true
+        }
+      ],
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 20
+              },
+              {
+                "color": "yellow",
+                "value": 45
+              },
+              {
+                "color": "orange",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 55
+              }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 3212,
+      "type": "stat",
+      "title": "🌡️ Drive 2",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "edum6q95peoe8d"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 2,
+        "x": 20,
+        "y": 380
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "megaraid_pd_temperature_celsius{instance=\"pve03.mynk.home\",slot=\"2\"}",
+          "instant": true
+        }
+      ],
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 20
+              },
+              {
+                "color": "yellow",
+                "value": 45
+              },
+              {
+                "color": "orange",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 55
+              }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 3213,
+      "type": "stat",
+      "title": "🌡️ Drive 3",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "edum6q95peoe8d"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 2,
+        "x": 22,
+        "y": 380
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "megaraid_pd_temperature_celsius{instance=\"pve03.mynk.home\",slot=\"3\"}",
+          "instant": true
+        }
+      ],
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 20
+              },
+              {
+                "color": "yellow",
+                "value": 45
+              },
+              {
+                "color": "orange",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 55
+              }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 3205,
+      "type": "table",
+      "title": "📋 物理ドライブ状況",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "edum6q95peoe8d"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 384
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "megaraid_pd_info{instance=\"pve03.mynk.home\"}",
+          "instant": true
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "megaraid_pd_media_errors_total{instance=\"pve03.mynk.home\"}",
+          "instant": true
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "megaraid_pd_other_errors_total{instance=\"pve03.mynk.home\"}",
+          "instant": true
+        },
+        {
+          "refId": "D",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "megaraid_pd_predictive_failures_total{instance=\"pve03.mynk.home\"}",
+          "instant": true
+        },
+        {
+          "refId": "E",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "megaraid_pd_temperature_celsius{instance=\"pve03.mynk.home\"}",
+          "instant": true
+        },
+        {
+          "refId": "F",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "megaraid_pd_smart_alert{instance=\"pve03.mynk.home\"}",
+          "instant": true
+        },
+        {
+          "refId": "G",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "megaraid_pd_reallocated_sectors{instance=\"pve03.mynk.home\"}",
+          "instant": true
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "slot": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "model": {
+                "aggregations": [
+                  "first"
+                ],
+                "operation": "aggregate"
+              },
+              "serial": {
+                "aggregations": [
+                  "first"
+                ],
+                "operation": "aggregate"
+              },
+              "state": {
+                "aggregations": [
+                  "first"
+                ],
+                "operation": "aggregate"
+              },
+              "size": {
+                "aggregations": [
+                  "first"
+                ],
+                "operation": "aggregate"
+              },
+              "speed": {
+                "aggregations": [
+                  "first"
+                ],
+                "operation": "aggregate"
+              },
+              "diskgroup": {
+                "aggregations": [
+                  "first"
+                ],
+                "operation": "aggregate"
+              },
+              "span": {
+                "aggregations": [
+                  "first"
+                ],
+                "operation": "aggregate"
+              },
+              "arm": {
+                "aggregations": [
+                  "first"
+                ],
+                "operation": "aggregate"
+              },
+              "megaraid_pd_temperature_celsius": {
+                "aggregations": [
+                  "max"
+                ],
+                "operation": "aggregate"
+              },
+              "megaraid_pd_media_errors_total": {
+                "aggregations": [
+                  "max"
+                ],
+                "operation": "aggregate"
+              },
+              "megaraid_pd_other_errors_total": {
+                "aggregations": [
+                  "max"
+                ],
+                "operation": "aggregate"
+              },
+              "megaraid_pd_predictive_failures_total": {
+                "aggregations": [
+                  "max"
+                ],
+                "operation": "aggregate"
+              },
+              "megaraid_pd_reallocated_sectors": {
+                "aggregations": [
+                  "max"
+                ],
+                "operation": "aggregate"
+              },
+              "megaraid_pd_smart_alert": {
+                "aggregations": [
+                  "max"
+                ],
+                "operation": "aggregate"
+              }
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "diskgroup (first)": true,
+              "span (first)": true,
+              "arm (first)": true
+            },
+            "indexByName": {
+              "slot": 0,
+              "state (first)": 1,
+              "model (first)": 2,
+              "serial (first)": 3,
+              "size (first)": 4,
+              "speed (first)": 5,
+              "megaraid_pd_temperature_celsius (max)": 6,
+              "megaraid_pd_media_errors_total (max)": 7,
+              "megaraid_pd_other_errors_total (max)": 8,
+              "megaraid_pd_predictive_failures_total (max)": 9,
+              "megaraid_pd_reallocated_sectors (max)": 10,
+              "megaraid_pd_smart_alert (max)": 11
+            },
+            "renameByName": {
+              "slot": "Slot",
+              "state (first)": "状態",
+              "model (first)": "モデル",
+              "serial (first)": "シリアル",
+              "size (first)": "容量",
+              "speed (first)": "速度",
+              "megaraid_pd_temperature_celsius (max)": "温度",
+              "megaraid_pd_media_errors_total (max)": "メディアエラー",
+              "megaraid_pd_other_errors_total (max)": "その他エラー",
+              "megaraid_pd_predictive_failures_total (max)": "予測故障",
+              "megaraid_pd_reallocated_sectors (max)": "代替済みセクタ",
+              "megaraid_pd_smart_alert (max)": "SMARTアラート"
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": [
+              {
+                "displayName": "Slot",
+                "desc": false
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "left"
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "状態"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "regex",
+                    "options": {
+                      "pattern": "Online.*",
+                      "result": {
+                        "color": "green",
+                        "index": 0
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "温度"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "celsius"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 45
+                    },
+                    {
+                      "color": "orange",
+                      "value": 50
+                    },
+                    {
+                      "color": "red",
+                      "value": 55
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "メディアエラー"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "transparent",
+                      "value": null
+                    },
+                    {
+                      "color": "red",
+                      "value": 1
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "その他エラー"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "transparent",
+                      "value": null
+                    },
+                    {
+                      "color": "red",
+                      "value": 1
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "予測故障"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "transparent",
+                      "value": null
+                    },
+                    {
+                      "color": "red",
+                      "value": 1
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "代替済みセクタ"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "transparent",
+                      "value": null
+                    },
+                    {
+                      "color": "orange",
+                      "value": 1
+                    },
+                    {
+                      "color": "red",
+                      "value": 100
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "SMARTアラート"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "0": {
+                        "text": "正常",
+                        "color": "transparent",
+                        "index": 0
+                      },
+                      "1": {
+                        "text": "⚠️ ALERT",
+                        "color": "red",
+                        "index": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "transparent",
+                      "value": null
+                    },
+                    {
+                      "color": "red",
+                      "value": 1
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "sortBy": [
+          {
+            "displayName": "Slot",
+            "desc": false
+          }
+        ]
+      }
+    },
+    {
+      "id": 3206,
+      "type": "timeseries",
+      "title": "🌡️ ドライブ温度推移",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "edum6q95peoe8d"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 392
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "megaraid_pd_temperature_celsius{instance=\"pve03.mynk.home\"}",
+          "instant": false,
+          "legendFormat": "Slot {{slot}} ({{model}})"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 3207,
+      "type": "timeseries",
+      "title": "⚠️ エラーカウント推移",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "edum6q95peoe8d"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 392
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "megaraid_pd_media_errors_total{instance=\"pve03.mynk.home\"}",
+          "instant": false,
+          "legendFormat": "メディアエラー Slot {{slot}}"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "megaraid_pd_other_errors_total{instance=\"pve03.mynk.home\"}",
+          "instant": false,
+          "legendFormat": "その他エラー Slot {{slot}}"
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "megaraid_pd_predictive_failures_total{instance=\"pve03.mynk.home\"}",
+          "instant": false,
+          "legendFormat": "予測故障 Slot {{slot}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 3214,
+      "type": "timeseries",
+      "title": "📶 ディスクI/Oスループット (VD別)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "edum6q95peoe8d"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 400
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "rate(megaraid_vd_read_bytes_total{instance=\"pve03.mynk.home\"}[2m])",
+          "instant": false,
+          "legendFormat": "読み取り {{name}} ({{device}})"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "rate(megaraid_vd_write_bytes_total{instance=\"pve03.mynk.home\"}[2m])",
+          "instant": false,
+          "legendFormat": "書き込み {{name}} ({{device}})"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 3215,
+      "type": "timeseries",
+      "title": "🔴 不良セクタ推移 (SMART)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "edum6q95peoe8d"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 400
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "megaraid_pd_reallocated_sectors{instance=\"pve03.mynk.home\"}",
+          "instant": false,
+          "legendFormat": "代替済みセクタ Slot {{slot}}"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "megaraid_pd_pending_sectors{instance=\"pve03.mynk.home\"}",
+          "instant": false,
+          "legendFormat": "保留セクタ Slot {{slot}}"
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "megaraid_pd_uncorrectable_sectors{instance=\"pve03.mynk.home\"}",
+          "instant": false,
+          "legendFormat": "修復不可セクタ Slot {{slot}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 3216,
+      "type": "bargauge",
+      "title": "⏱️ 通電時間 (Power-On Hours)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "edum6q95peoe8d"
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 408
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "megaraid_pd_power_on_hours{instance=\"pve03.mynk.home\"}",
+          "instant": true,
+          "legendFormat": "Slot {{slot}} ({{model}})"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "h",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 30000
+              },
+              {
+                "color": "orange",
+                "value": 40000
+              },
+              {
+                "color": "red",
+                "value": 50000
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "displayMode": "gradient",
+        "showUnfilled": true
+      }
+    },
+    {
+      "id": 3217,
+      "type": "stat",
+      "title": "🔴 代替済みセクタ数 (Slot 3 要注意)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "edum6q95peoe8d"
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 408
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "megaraid_pd_reallocated_sectors{instance=\"pve03.mynk.home\"}",
+          "instant": true,
+          "legendFormat": "Slot {{slot}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 100
+              }
+            ]
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value_and_name",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -167,6 +167,26 @@ Prometheus から正常に scrape できている例です。
 
 ![Prometheus temperature metric](docs/images/prometheus-temperature.png)
 
+## Grafana での確認例
+
+この exporter で取得したメトリクスは、Grafana 上で
+「物理ドライブ温度」「エラー回数」「Online / Offline 状態」
+「代替済みセクタ数」「仮想ドライブの劣化状態」などをまとめて可視化できます。
+
+MegaRAID パネル群の例は、統合ダッシュボードから切り出した
+テンプレート JSON を参照してください。
+
+- [grafana_template/megaraid_panels.json](./grafana_template/megaraid_panels.json)
+
+この JSON には、検証環境で実際に使っている
+MegaRAID 用の row / stat / table / timeseries / bargauge パネル群だけを
+抜き出してあります。
+
+Grafana のスクリーンショットを repo に追加する場合は、
+たとえば次のパスに置く想定です。
+
+- `docs/images/grafana-dashboard.png`
+
 ## メトリクス一覧
 
 ### 物理ドライブ
