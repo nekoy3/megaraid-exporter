@@ -187,6 +187,8 @@ Grafana のスクリーンショットを repo に追加する場合は、
 
 - `docs/images/grafana-dashboard.png`
 
+![Grafana dashboard example](docs/images/grafana-dashboard.png)
+
 ## メトリクス一覧
 
 ### 物理ドライブ
