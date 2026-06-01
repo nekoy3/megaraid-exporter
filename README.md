@@ -193,47 +193,49 @@ Grafana のスクリーンショットを repo に追加する場合は、
 
 ![Grafana dashboard example](docs/images/grafana-dashboard.png)
 
-（ちなみにdegratedになってるのは、不良セクタが発生した disk3 を切り離して不完全な状態になっているため）
+（ちなみに degraded になっているのは、不良セクタが発生した disk3 を切り離して不完全な状態になっているためです）
 
 ## メトリクス一覧
+
+現在の exporter が出力するメトリクスは、次の 16 種類です。
 
 ### 物理ドライブ
 
 - `megaraid_pd_info`
-  - 物理ドライブ情報。`slot`、`device_id`、`serial`、`model`、`firmware_state` に加えて、`state`、`size`、`speed`、`diskgroup`、`span`、`arm` をラベルに持つ info 用 gauge
+  - 物理ドライブ情報を表す gauge。`slot`、`device_id`、`serial`、`model`、`firmware_state`、`state`、`size`、`speed`、`diskgroup`、`span`、`arm` をラベルに持ちます
 - `megaraid_pd_online`
-  - 物理ドライブがオンラインなら `1`、オフラインなら `0`
+  - 物理ドライブがオンラインなら `1`、オフラインなら `0` の gauge
 - `megaraid_pd_temperature_celsius`
-  - 物理ドライブ温度
+  - 物理ドライブ温度を表す gauge
 - `megaraid_pd_media_errors_total`
-  - 物理ドライブのメディアエラー回数
+  - 物理ドライブのメディアエラー回数を表す counter
 - `megaraid_pd_other_errors_total`
-  - 物理ドライブのその他エラー回数
+  - 物理ドライブのその他エラー回数を表す counter
 - `megaraid_pd_predictive_failures_total`
-  - 物理ドライブの予測故障回数
+  - 物理ドライブの予測故障回数を表す counter
 - `megaraid_pd_smart_alert`
-  - メディアエラーまたは予測故障があれば `1`
+  - メディアエラーまたは予測故障があれば `1` になる gauge
 - `megaraid_pd_reallocated_sectors`
-  - SMART 属性 5。代替済みセクタ数
+  - SMART 属性 5。代替済みセクタ数を表す gauge
 - `megaraid_pd_pending_sectors`
-  - SMART 属性 197。保留中セクタ数
+  - SMART 属性 197。保留中セクタ数を表す gauge
 - `megaraid_pd_uncorrectable_sectors`
-  - SMART 属性 198。回復不能セクタ数
+  - SMART 属性 198。回復不能セクタ数を表す gauge
 - `megaraid_pd_power_on_hours`
-  - SMART 属性 9。通電時間
+  - SMART 属性 9。通電時間を表す counter
 
 ### 仮想ドライブ
 
 - `megaraid_vd_optimal`
-  - 仮想ドライブが `Optimal` なら `1`、それ以外なら `0`
+  - 仮想ドライブが `Optimal` なら `1`、それ以外なら `0` の gauge
 - `megaraid_vd_info`
-  - 仮想ドライブ情報。`name`、`target_id`、`raid_level`、`state`、`size`、`drives_per_span`、`span_depth`、`number_of_spans` をラベルに持つ info 用 gauge
+  - 仮想ドライブ情報を表す gauge。`name`、`target_id`、`raid_level`、`state`、`size`、`drives_per_span`、`span_depth`、`number_of_spans` をラベルに持ちます
 - `megaraid_vd_member_info`
-  - 仮想ドライブを構成している物理ドライブの対応表。`仮想ドライブ -> DiskGroup / Span / Arm / Slot` の関係をラベルとして持つ info 用 gauge
+  - 仮想ドライブを構成している物理ドライブの対応表を表す gauge。`仮想ドライブ -> DiskGroup / Span / Arm / Slot` の関係をラベルとして持ちます
 - `megaraid_vd_read_bytes_total`
-  - 仮想ドライブの累積読み込みバイト数
+  - 仮想ドライブの累積読み込みバイト数を表す counter
 - `megaraid_vd_write_bytes_total`
-  - 仮想ドライブの累積書き込みバイト数
+  - 仮想ドライブの累積書き込みバイト数を表す counter
 
 ## 実行方法
 
