@@ -37,6 +37,12 @@ def parse_pd_list():
             current = {"slot": line.split(":", 1)[1].strip()}
         elif line.startswith("Device Id:"):
             current["device_id"] = line.split(":", 1)[1].strip()
+        elif line.startswith("Drive's position:"):
+            match = re.search(r"DiskGroup:\s*(\d+),\s*Span:\s*(\d+),\s*Arm:\s*(\d+)", line)
+            if match:
+                current["diskgroup"] = match.group(1)
+                current["span"] = match.group(2)
+                current["arm"] = match.group(3)
         elif line.startswith("Media Error Count:"):
             current["media_errors"] = int(line.split(":", 1)[1].strip())
         elif line.startswith("Other Error Count:"):
@@ -48,6 +54,11 @@ def parse_pd_list():
             current["firmware_state_str"] = raw
             base = raw.split(",")[0].strip().lower()
             current["online"] = 1 if "online" in base else 0
+            current["state"] = raw.split(",")[0].strip()
+        elif line.startswith("Coerced Size:"):
+            current["size"] = line.split("[", 1)[0].split(":", 1)[1].strip()
+        elif line.startswith("Device Speed:"):
+            current["speed"] = line.split(":", 1)[1].strip()
         elif line.startswith("Drive Temperature"):
             match = re.search(r"(\d+)C", line)
             if match:
@@ -111,6 +122,88 @@ def parse_ld_list():
     if current and "vd" in current:
         drives.append(current)
     return drives
+
+
+def parse_ld_pd_info():
+    output = run_megacli("-LdPdInfo", "-aALL")
+    members = []
+    virtual_drives = []
+    current_vd = None
+    current_span = None
+    current_pd = None
+
+    def finish_pd():
+        nonlocal current_pd
+        if current_vd and current_pd and "slot" in current_pd:
+            member = dict(current_pd)
+            member["vd"] = current_vd.get("vd", "?")
+            member["target_id"] = current_vd.get("target_id", "?")
+            member["name"] = current_vd.get("name", current_vd.get("vd", "?"))
+            member["raid_level"] = current_vd.get("raid_level", "unknown")
+            member["vd_state"] = current_vd.get("state", "unknown")
+            member["vd_size"] = current_vd.get("size", "unknown")
+            member["drives_per_span"] = current_vd.get("drives_per_span", "unknown")
+            member["span_depth"] = current_vd.get("span_depth", "unknown")
+            member["number_of_spans"] = current_vd.get("number_of_spans", "unknown")
+            member["span"] = current_span if current_span is not None else current_pd.get("span", "unknown")
+            members.append(member)
+        current_pd = None
+
+    def finish_vd():
+        nonlocal current_vd, current_span
+        finish_pd()
+        if current_vd and "vd" in current_vd:
+            virtual_drives.append(current_vd)
+        current_vd = None
+        current_span = None
+
+    for raw_line in output.splitlines():
+        line = raw_line.strip()
+        if line.startswith("Virtual Drive:"):
+            finish_vd()
+            match = re.search(r"Virtual Drive:\s*(\d+).*Target Id:\s*(\d+)", line)
+            current_vd = {
+                "vd": match.group(1) if match else "?",
+                "target_id": match.group(2) if match else "?",
+            }
+        elif current_vd is not None and line.startswith("Name"):
+            current_vd["name"] = line.split(":", 1)[1].strip()
+        elif current_vd is not None and line.startswith("RAID Level"):
+            current_vd["raid_level"] = line.split(":", 1)[1].strip()
+        elif current_vd is not None and line.startswith("Size"):
+            current_vd["size"] = line.split(":", 1)[1].strip()
+        elif current_vd is not None and line.startswith("State"):
+            current_vd["state"] = line.split(":", 1)[1].strip()
+        elif current_vd is not None and line.startswith("Number Of Drives per span:"):
+            current_vd["drives_per_span"] = line.split(":", 1)[1].strip()
+        elif current_vd is not None and line.startswith("Span Depth"):
+            current_vd["span_depth"] = line.split(":", 1)[1].strip()
+        elif current_vd is not None and line.startswith("Number of Spans:"):
+            current_vd["number_of_spans"] = line.split(":", 1)[1].strip()
+        elif current_vd is not None and line.startswith("Span:"):
+            finish_pd()
+            match = re.search(r"Span:\s*(\d+)", line)
+            current_span = match.group(1) if match else "unknown"
+        elif current_vd is not None and line.startswith("PD:"):
+            finish_pd()
+            current_pd = {}
+        elif current_pd is not None and line.startswith("Slot Number:"):
+            current_pd["slot"] = line.split(":", 1)[1].strip()
+        elif current_pd is not None and line.startswith("Device Id:"):
+            current_pd["device_id"] = line.split(":", 1)[1].strip()
+        elif current_pd is not None and line.startswith("Drive's position:"):
+            match = re.search(r"DiskGroup:\s*(\d+),\s*Span:\s*(\d+),\s*Arm:\s*(\d+)", line)
+            if match:
+                current_pd["diskgroup"] = match.group(1)
+                current_pd["span"] = match.group(2)
+                current_pd["arm"] = match.group(3)
+        elif current_pd is not None and line.startswith("Firmware state:"):
+            current_pd["firmware_state"] = line.split(":", 1)[1].strip().split(",")[0].strip()
+        elif current_pd is not None and line.startswith("Inquiry Data:"):
+            parse_inquiry_data(current_pd, line.split(":", 1)[1])
+
+    finish_vd()
+    return virtual_drives, members
 
 
 def build_smart_device_ids():
@@ -184,6 +277,7 @@ def generate_metrics():
 
     pd_list = parse_pd_list()
     ld_list = parse_ld_list()
+    ld_pd_virtual_drives, ld_pd_members = parse_ld_pd_info()
     diskstats = get_diskstats()
     smart_device_ids = build_smart_device_ids()
 
@@ -195,8 +289,14 @@ def generate_metrics():
         serial = pd.get("serial", "unknown")
         device_id = pd.get("device_id", "unknown")
         fw = pd.get("firmware_state_str", "unknown").split(",")[0].strip()
+        state = pd.get("state", fw)
+        size = pd.get("size", "unknown")
+        speed = pd.get("speed", "unknown")
+        diskgroup = pd.get("diskgroup", "unknown")
+        span = pd.get("span", "unknown")
+        arm = pd.get("arm", "unknown")
         lines.append(
-            f'megaraid_pd_info{{slot="{slot}",device_id="{device_id}",serial="{serial}",model="{model}",firmware_state="{fw}"}} 1'
+            f'megaraid_pd_info{{slot="{slot}",device_id="{device_id}",serial="{serial}",model="{model}",firmware_state="{fw}",state="{state}",size="{size}",speed="{speed}",diskgroup="{diskgroup}",span="{span}",arm="{arm}"}} 1'
         )
 
     lines.append("# HELP megaraid_pd_online Physical drive online status (1=online)")
@@ -305,6 +405,22 @@ def generate_metrics():
         raid = ld.get("raid_level", "unknown")
         lines.append(
             f'megaraid_vd_optimal{{name="{name}",raid_level="{raid}"}} {ld.get("optimal", 0)}'
+        )
+
+    lines.append("# HELP megaraid_vd_info Virtual drive configuration info")
+    lines.append("# TYPE megaraid_vd_info gauge")
+    for vd in ld_pd_virtual_drives:
+        lines.append(
+            f'megaraid_vd_info{{vd="{vd.get("vd", "?")}",target_id="{vd.get("target_id", "?")}",name="{vd.get("name", "?")}",raid_level="{vd.get("raid_level", "unknown")}",state="{vd.get("state", "unknown")}",size="{vd.get("size", "unknown")}",drives_per_span="{vd.get("drives_per_span", "unknown")}",span_depth="{vd.get("span_depth", "unknown")}",number_of_spans="{vd.get("number_of_spans", "unknown")}"}} 1'
+        )
+
+    lines.append("# HELP megaraid_vd_member_info Virtual drive member layout info")
+    lines.append("# TYPE megaraid_vd_member_info gauge")
+    for member in ld_pd_members:
+        model = re.sub(r"\s+", " ", member.get("model", member.get("inquiry_data", "unknown"))).strip()
+        serial = member.get("serial", "unknown")
+        lines.append(
+            f'megaraid_vd_member_info{{vd="{member.get("vd", "?")}",target_id="{member.get("target_id", "?")}",name="{member.get("name", "?")}",raid_level="{member.get("raid_level", "unknown")}",vd_state="{member.get("vd_state", "unknown")}",vd_size="{member.get("vd_size", "unknown")}",drives_per_span="{member.get("drives_per_span", "unknown")}",span_depth="{member.get("span_depth", "unknown")}",number_of_spans="{member.get("number_of_spans", "unknown")}",diskgroup="{member.get("diskgroup", "unknown")}",span="{member.get("span", "unknown")}",arm="{member.get("arm", "unknown")}",slot="{member.get("slot", "?")}",device_id="{member.get("device_id", "unknown")}",serial="{serial}",model="{model}",firmware_state="{member.get("firmware_state", "unknown")}"}} 1'
         )
 
     lines.append("# HELP megaraid_vd_read_bytes_total Total bytes read from virtual drive")

@@ -8,17 +8,18 @@
     3202,
     3203,
     3204,
+    3205,
+    3206,
+    3207,
     3210,
     3211,
     3212,
     3213,
-    3205,
-    3206,
-    3207,
     3214,
     3215,
     3216,
-    3217
+    3217,
+    3218
   ],
   "panels": [
     {
@@ -785,24 +786,23 @@
         {
           "id": "organize",
           "options": {
-            "excludeByName": {
-              "diskgroup (first)": true,
-              "span (first)": true,
-              "arm (first)": true
-            },
+            "excludeByName": {},
             "indexByName": {
               "slot": 0,
-              "state (first)": 1,
-              "model (first)": 2,
-              "serial (first)": 3,
-              "size (first)": 4,
-              "speed (first)": 5,
-              "megaraid_pd_temperature_celsius (max)": 6,
-              "megaraid_pd_media_errors_total (max)": 7,
-              "megaraid_pd_other_errors_total (max)": 8,
-              "megaraid_pd_predictive_failures_total (max)": 9,
-              "megaraid_pd_reallocated_sectors (max)": 10,
-              "megaraid_pd_smart_alert (max)": 11
+              "diskgroup (first)": 1,
+              "span (first)": 2,
+              "arm (first)": 3,
+              "state (first)": 4,
+              "model (first)": 5,
+              "serial (first)": 6,
+              "size (first)": 7,
+              "speed (first)": 8,
+              "megaraid_pd_temperature_celsius (max)": 9,
+              "megaraid_pd_media_errors_total (max)": 10,
+              "megaraid_pd_other_errors_total (max)": 11,
+              "megaraid_pd_predictive_failures_total (max)": 12,
+              "megaraid_pd_reallocated_sectors (max)": 13,
+              "megaraid_pd_smart_alert (max)": 14
             },
             "renameByName": {
               "slot": "Slot",
@@ -816,7 +816,10 @@
               "megaraid_pd_other_errors_total (max)": "その他エラー",
               "megaraid_pd_predictive_failures_total (max)": "予測故障",
               "megaraid_pd_reallocated_sectors (max)": "代替済みセクタ",
-              "megaraid_pd_smart_alert (max)": "SMARTアラート"
+              "megaraid_pd_smart_alert (max)": "SMARTアラート",
+              "diskgroup (first)": "DiskGroup",
+              "span (first)": "Span",
+              "arm (first)": "Arm"
             }
           }
         },
@@ -1112,6 +1115,221 @@
       }
     },
     {
+      "id": 3218,
+      "type": "table",
+      "title": "🧩 RAID構成 / ディスク配分",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "edum6q95peoe8d"
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 392
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "edum6q95peoe8d"
+          },
+          "expr": "megaraid_vd_member_info{instance=\"pve03.mynk.home\"}",
+          "instant": true
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true,
+              "__name__": true,
+              "vd": true
+            },
+            "indexByName": {
+              "name": 0,
+              "target_id": 1,
+              "raid_level": 2,
+              "vd_state": 3,
+              "vd_size": 4,
+              "number_of_spans": 5,
+              "drives_per_span": 6,
+              "span_depth": 7,
+              "diskgroup": 8,
+              "span": 9,
+              "arm": 10,
+              "slot": 11,
+              "device_id": 12,
+              "firmware_state": 13,
+              "serial": 14,
+              "model": 15
+            },
+            "renameByName": {
+              "name": "仮想ドライブ",
+              "target_id": "Target ID",
+              "raid_level": "RAIDレベル",
+              "vd_state": "仮想ドライブ状態",
+              "vd_size": "容量",
+              "number_of_spans": "Span数",
+              "drives_per_span": "Spanごとの台数",
+              "span_depth": "Span Depth",
+              "diskgroup": "DiskGroup",
+              "span": "Span",
+              "arm": "Arm",
+              "slot": "Slot",
+              "device_id": "Device ID",
+              "firmware_state": "物理状態",
+              "serial": "シリアル",
+              "model": "モデル"
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": [
+              {
+                "displayName": "仮想ドライブ",
+                "desc": false
+              },
+              {
+                "displayName": "Span",
+                "desc": false
+              },
+              {
+                "displayName": "Arm",
+                "desc": false
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "left"
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "仮想ドライブ状態"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "regex",
+                    "options": {
+                      "pattern": "Optimal.*",
+                      "result": {
+                        "color": "green",
+                        "index": 0
+                      }
+                    }
+                  },
+                  {
+                    "type": "regex",
+                    "options": {
+                      "pattern": "Degraded.*",
+                      "result": {
+                        "color": "red",
+                        "index": 1
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "物理状態"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "regex",
+                    "options": {
+                      "pattern": "Online.*",
+                      "result": {
+                        "color": "green",
+                        "index": 0
+                      }
+                    }
+                  },
+                  {
+                    "type": "regex",
+                    "options": {
+                      "pattern": "Offline.*",
+                      "result": {
+                        "color": "red",
+                        "index": 1
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "sortBy": [
+          {
+            "displayName": "仮想ドライブ",
+            "desc": false
+          }
+        ]
+      }
+    },
+    {
       "id": 3206,
       "type": "timeseries",
       "title": "🌡️ ドライブ温度推移",
@@ -1123,7 +1341,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 392
+        "y": 398
       },
       "targets": [
         {
@@ -1172,7 +1390,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 392
+        "y": 398
       },
       "targets": [
         {
@@ -1241,7 +1459,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 400
+        "y": 406
       },
       "targets": [
         {
@@ -1301,7 +1519,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 400
+        "y": 406
       },
       "targets": [
         {
@@ -1383,7 +1601,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 408
+        "y": 414
       },
       "targets": [
         {
@@ -1450,7 +1668,7 @@
         "h": 6,
         "w": 12,
         "x": 12,
-        "y": 408
+        "y": 414
       },
       "targets": [
         {
