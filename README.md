@@ -150,6 +150,23 @@ systemctl status megaraid-exporter.service
 
 Prometheus からは `http://<host>:9925/metrics` を scrape 対象に追加してください。
 
+## Prometheus での確認例
+
+### ターゲット登録状態
+
+`pve03.mynk.home:9925` を `megaraid` ジョブとして登録し、
+Prometheus から正常に scrape できている例です。
+
+![Prometheus Targets](docs/images/prometheus-targets.png)
+
+### 温度メトリクスの例
+
+`megaraid_pd_temperature_celsius` を Prometheus の Expression Browser で
+確認した例です。`instance`、`slot`、`device_id` などのラベル付きで
+温度メトリクスを取得できていることが分かります。
+
+![Prometheus temperature metric](docs/images/prometheus-temperature.png)
+
 ## メトリクス一覧
 
 ### 物理ドライブ
