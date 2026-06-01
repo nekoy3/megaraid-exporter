@@ -42,6 +42,62 @@ MegaRAID 系コントローラを対象にしています。
 言い換えると、「そのまま動くかもしれないが、少なくともこの README が保証しているのは
 M5210 上での動作まで」です。
 
+たとえば Dell R630 / R730 でも、搭載している PERC が内部的に MegaRAID 互換で、
+次の 4 つが期待通り動くなら、そのまま使える可能性は高いです。
+
+```bash
+megacli -PDList -aALL
+megacli -LdPdInfo -aALL
+smartctl --scan
+smartctl -A -d megaraid,0 /dev/bus/0
+```
+
+逆に、このどれかが通らない場合は、そのままでは動かないか、
+少なくとも少し調整が必要です。
+
+### 互換性確認の目安
+
+- `megacli -PDList -aALL`
+  - 物理ドライブ一覧、`Slot Number`、`Device Id`、`Inquiry Data` が取れる
+- `megacli -LdPdInfo -aALL`
+  - 仮想ドライブと物理ドライブの対応、`Span`、`Arm` が取れる
+- `smartctl --scan`
+  - `/dev/bus/0 -d megaraid,N` の形でデバイスが列挙される
+- `smartctl -A -d megaraid,N /dev/bus/0`
+  - SMART 属性 5 / 9 / 197 / 198 が読める
+
+### 検証環境での出力例
+
+`megacli -PDList -aALL` の例:
+
+```text
+Slot Number: 3
+Drive's position: DiskGroup: 0, Span: 1, Arm: 1
+Device Id: 15
+Firmware state: Offline
+Inquiry Data:            69POCFDJTTOSHIBA MQ01ABF050                      AM002K
+```
+
+`megacli -LdPdInfo -aALL` の例:
+
+```text
+Virtual Drive: 1 (Target Id: 1)
+Name                :pve
+RAID Level          : Primary-1, Secondary-0, RAID Level Qualifier-0
+State               : Degraded
+Span: 1 - Number of PDs: 2
+Drive's position: DiskGroup: 0, Span: 1, Arm: 1
+```
+
+`smartctl --scan` の例:
+
+```text
+/dev/bus/0 -d megaraid,13
+/dev/bus/0 -d megaraid,14
+/dev/bus/0 -d megaraid,15
+/dev/bus/0 -d megaraid,16
+```
+
 ## 動作確認したソフトウェア
 
 - Python: `3.11.2`
