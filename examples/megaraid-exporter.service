@@ -1,0 +1,12 @@
+[Unit]
+Description=MegaRAID Prometheus Exporter
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/megaraid_exporter.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
