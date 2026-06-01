@@ -285,7 +285,7 @@ Grafana のスクリーンショットを repo に追加する場合は、
 - `megaraid_vd_optimal`
   - 仮想ドライブが `Optimal` なら `1`、それ以外なら `0` の gauge
 - `megaraid_vd_info`
-  - 仮想ドライブ情報を表す gauge。`name`、`target_id`、`raid_level`、`state`、`size`、`drives_per_span`、`span_depth`、`number_of_spans` をラベルに持ちます
+  - 仮想ドライブ情報を表す gauge。`name`、`target_id`、`raid_level`、`state`、`size`、`drives_per_span`、`span_depth`、`number_of_spans` に加えて、Linux 側の block device 対応を見るための `blockdev`、`blockdev_size`、`blockdev_model`、`blockdev_serial`、`blockdev_vendor`、`hctl` をラベルに持ちます
 - `megaraid_vd_member_info`
   - 仮想ドライブを構成している物理ドライブの対応表を表す gauge。`仮想ドライブ -> DiskGroup / Span / Arm / Slot` の関係をラベルとして持ちます
 - `megaraid_vd_read_bytes_total`
@@ -310,11 +310,12 @@ python3 megaraid_exporter.py
 ## 実装上の前提
 
 - 仮想ドライブの I/O バイト数は `/proc/diskstats` を読みます
-- `VD_TO_BLOCKDEV` は、現在の検証環境では `0 -> sda`, `1 -> sdb` を前提にしています
+- 仮想ドライブと Linux の block device の対応付けは `lsblk -J -o NAME,TYPE,SIZE,MODEL,SERIAL,VENDOR,HCTL` から自動検出します
+- 現在の検証環境では、`HCTL` の target 番号と MegaCLI の `Target Id` が一致しています
 - 物理ドライブと `smartctl -d megaraid,N` の対応付けには、MegaCLI の `Device Id` を使っています
 
-環境によっては、仮想ドライブと block device の対応付け部分は
-調整が必要になるかもしれません。
+環境によっては、`HCTL` と MegaCLI の `Target Id` の対応関係が異なる可能性があるため、
+その場合は block device 検出部分の調整が必要になるかもしれません。
 
 ## ライセンス
 

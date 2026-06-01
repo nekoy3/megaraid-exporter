@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 """MegaRAID Prometheus Exporter - matches Grafana dashboard metric names."""
 
+import json
 import re
 import subprocess
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 PORT = 9925
 MEGACLI = "/usr/sbin/megacli"
-
-# VD Target ID -> block device name mapping
-VD_TO_BLOCKDEV = {0: "sda", 1: "sdb"}
-
 
 def run_megacli(*args):
     try:
@@ -272,6 +269,97 @@ def get_diskstats():
     return stats
 
 
+def parse_human_size_to_bytes(value):
+    """Convert sizes like '890.625 GB' or '38.8G' to bytes."""
+    if not value:
+        return None
+    match = re.match(r"\s*([0-9]+(?:\.[0-9]+)?)\s*([KMGTPE]?)(?:i?B)?\s*$", value, re.IGNORECASE)
+    if not match:
+        return None
+    number = float(match.group(1))
+    unit = match.group(2).upper()
+    multipliers = {
+        "": 1,
+        "K": 1024**1,
+        "M": 1024**2,
+        "G": 1024**3,
+        "T": 1024**4,
+        "P": 1024**5,
+        "E": 1024**6,
+    }
+    return int(number * multipliers[unit])
+
+
+def get_virtual_drive_blockdev_candidates():
+    """Return [{target_id, name, size, model, serial, vendor, hctl}]."""
+    devices = []
+    try:
+        result = subprocess.run(
+            ["lsblk", "-J", "-o", "NAME,TYPE,SIZE,MODEL,SERIAL,VENDOR,HCTL"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        payload = json.loads(result.stdout or "{}")
+    except Exception:
+        return devices
+
+    for device in payload.get("blockdevices", []):
+        if device.get("type") != "disk":
+            continue
+        hctl = (device.get("hctl") or "").strip()
+        if not hctl:
+            continue
+        match = re.match(r"\d+:\d+:(\d+):\d+", hctl)
+        if not match:
+            continue
+
+        devices.append({
+            "target_id": int(match.group(1)),
+            "name": device.get("name", ""),
+            "size": (device.get("size") or "").strip(),
+            "model": re.sub(r"\s+", " ", device.get("model") or "").strip(),
+            "serial": (device.get("serial") or "").strip(),
+            "vendor": re.sub(r"\s+", " ", device.get("vendor") or "").strip(),
+            "hctl": hctl,
+        })
+    return devices
+
+
+def resolve_virtual_drive_blockdevs(ld_list, candidates):
+    """Return {target_id: candidate} using target id and size matching."""
+    grouped = {}
+    for candidate in candidates:
+        grouped.setdefault(candidate["target_id"], []).append(candidate)
+
+    resolved = {}
+    for ld in ld_list:
+        target_id = ld.get("target_id", -1)
+        options = grouped.get(target_id, [])
+        if not options:
+            continue
+
+        if len(options) == 1:
+            resolved[target_id] = options[0]
+            continue
+
+        wanted = parse_human_size_to_bytes(ld.get("size", ""))
+        if wanted is not None:
+            ranked = []
+            for option in options:
+                have = parse_human_size_to_bytes(option.get("size", ""))
+                if have is None:
+                    continue
+                ranked.append((abs(have - wanted), option))
+            if ranked:
+                ranked.sort(key=lambda item: item[0])
+                resolved[target_id] = ranked[0][1]
+                continue
+
+        resolved[target_id] = options[0]
+    return resolved
+
+
 def generate_metrics():
     lines = []
 
@@ -279,6 +367,7 @@ def generate_metrics():
     ld_list = parse_ld_list()
     ld_pd_virtual_drives, ld_pd_members = parse_ld_pd_info()
     diskstats = get_diskstats()
+    vd_blockdevs = resolve_virtual_drive_blockdevs(ld_list, get_virtual_drive_blockdev_candidates())
     smart_device_ids = build_smart_device_ids()
 
     lines.append("# HELP megaraid_pd_info Physical drive info")
@@ -410,8 +499,9 @@ def generate_metrics():
     lines.append("# HELP megaraid_vd_info Virtual drive configuration info")
     lines.append("# TYPE megaraid_vd_info gauge")
     for vd in ld_pd_virtual_drives:
+        blockdev = vd_blockdevs.get(int(vd.get("target_id", -1)), {})
         lines.append(
-            f'megaraid_vd_info{{vd="{vd.get("vd", "?")}",target_id="{vd.get("target_id", "?")}",name="{vd.get("name", "?")}",raid_level="{vd.get("raid_level", "unknown")}",state="{vd.get("state", "unknown")}",size="{vd.get("size", "unknown")}",drives_per_span="{vd.get("drives_per_span", "unknown")}",span_depth="{vd.get("span_depth", "unknown")}",number_of_spans="{vd.get("number_of_spans", "unknown")}"}} 1'
+            f'megaraid_vd_info{{vd="{vd.get("vd", "?")}",target_id="{vd.get("target_id", "?")}",name="{vd.get("name", "?")}",raid_level="{vd.get("raid_level", "unknown")}",state="{vd.get("state", "unknown")}",size="{vd.get("size", "unknown")}",drives_per_span="{vd.get("drives_per_span", "unknown")}",span_depth="{vd.get("span_depth", "unknown")}",number_of_spans="{vd.get("number_of_spans", "unknown")}",blockdev="{blockdev.get("name", "unknown")}",blockdev_size="{blockdev.get("size", "unknown")}",blockdev_model="{blockdev.get("model", "unknown")}",blockdev_serial="{blockdev.get("serial", "unknown")}",blockdev_vendor="{blockdev.get("vendor", "unknown")}",hctl="{blockdev.get("hctl", "unknown")}"}} 1'
         )
 
     lines.append("# HELP megaraid_vd_member_info Virtual drive member layout info")
@@ -430,14 +520,14 @@ def generate_metrics():
     for ld in ld_list:
         name = ld.get("name", ld.get("vd", "?"))
         target_id = ld.get("target_id", -1)
-        blockdev = VD_TO_BLOCKDEV.get(target_id)
+        blockdev = vd_blockdevs.get(target_id, {}).get("name")
         if blockdev and blockdev in diskstats:
             ds = diskstats[blockdev]
             lines.append(
-                f'megaraid_vd_read_bytes_total{{name="{name}",dev="{blockdev}"}} {ds["read_bytes"]}'
+                f'megaraid_vd_read_bytes_total{{name="{name}",target_id="{target_id}",dev="{blockdev}"}} {ds["read_bytes"]}'
             )
             lines.append(
-                f'megaraid_vd_write_bytes_total{{name="{name}",dev="{blockdev}"}} {ds["write_bytes"]}'
+                f'megaraid_vd_write_bytes_total{{name="{name}",target_id="{target_id}",dev="{blockdev}"}} {ds["write_bytes"]}'
             )
 
     return "\n".join(lines) + "\n"
